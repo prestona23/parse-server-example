@@ -27,6 +27,19 @@ Parse.Cloud.afterSave("CheckIn", function(request) {
 	  //var message = username.concat(' is going to ', courtname, ' at ', str)
 	  var message = username.concat(" is going to ",courtName, " at ",str)
 	  console.log(message)
+		
+		Parse.Push.send({
+		  where: pushQuery,
+			  data: {
+			    alert: message
+			  }
+		  }).then(function() {
+			    // Push was successful
+				console.log('Push Success!!!');
+		  }, function(error) {
+				console.log('Push Error');
+			    throw "Got an error " + error.code + " : " + error.message;
+		  });
     });
   }, function(error) {
 	console.log("error in CheckIn afterSave:"+error.message+":")

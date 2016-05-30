@@ -24,6 +24,20 @@ var api = new ParseServer({
     "hoop-spot-dev-east",
     {directAccess: true}
   ),
+  push: {
+    ios: [
+      {
+        pfx: '/push/ios/HoopSpotDevPushCertificate.p12', // Dev PFX or P12
+        bundleId: 'com.mobile-software.HoopSpot',
+        production: false // Dev
+      },
+      {
+        pfx: '/push/ios/HoopSpotProductionPush.p12', // Prod PFX or P12
+        bundleId: 'com.mobile-software.HoopSpot',  
+        production: true // Prod
+      }
+    ]
+  },
   liveQuery: {
     classNames: ["Posts", "Comments"] // List of classes to support for query subscriptions
   }
