@@ -33,7 +33,7 @@ Parse.Cloud.afterSave("CheckIn", function(request) {
 			  data: {
 			    alert: message
 			  }
-		  }).then(function() {
+		  }, { useMasterKey: true }).then(function() {
 			    // Push was successful
 				console.log('Push Success!!!');
 		  }, function(error) {
