@@ -29,7 +29,7 @@ Parse.Cloud.afterSave("CheckIn", function(request) {
 	  console.log(message)
     });
   }, function(error) {
-	console.log("error in CheckIn afterSave:"+error)
+	console.log("error in CheckIn afterSave:"+error.message+":")
   });
   
   console.log('afterSave end');
