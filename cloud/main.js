@@ -48,3 +48,40 @@ Parse.Cloud.afterSave("CheckIn", function(request) {
   console.log('afterSave end');
   
 });
+
+Parse.Cloud.afterSave("Activity", function(request) {
+	console.log('Activity aftersave');
+	var activityType = request.object.get('type');
+	
+	var location = request.object.get("location");
+	var toUser = request.object.get("toUser");
+	
+	if(activityType == "Like") {
+		var leaderboardQuery = new Parse.Query("Leaderboard");
+		leaderboardQuery.equalTo("court",location);
+		leaderboardQuery.equalTo("user",toUser);
+		leaderboardQuery.find().then(function(results) {
+			
+			if (results.length > 0) {
+				var leaderboardObject = results[0];
+				leaderboardObject.increment('score');
+				return leaderboardObject.save();
+			}
+			else {
+				//Realistically this shouldn't happen because you should be tagged by a checked in user.
+				var Leaderboard = Parse.Object.extend("Leaderboard");
+				var object = new Leaderboard();
+				object.set("user", toUser);
+				object.set("court", location);
+				object.set("score", 1);
+				return object.save();
+
+			}
+		}, function(error){
+			console.log("Error updating leaderboard");
+		});
+		
+		
+	}
+	
+});
