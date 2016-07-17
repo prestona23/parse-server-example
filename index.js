@@ -20,9 +20,9 @@ var api = new ParseServer({
   serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse',  // Don't forget to change to https if needed
   maxUploadSize: '30mb',
   filesAdapter: new S3Adapter(
-    "AKIAISHUEJUZGO6AMJHA",
-    "ElArUzgqKYryOVYmVySHnFixV//YrT3hX0K7ilj/",
-    "hoop-spot-dev-east",
+    process.env.S3_ACCESS_KEY || '',
+    process.env.S3_SECRET_KEY || '',
+    process.env.S3_BUCKET || '',
     {directAccess: true}
   ),
   push: {
@@ -41,6 +41,21 @@ var api = new ParseServer({
   },
   liveQuery: {
     classNames: ["Posts", "Comments"] // List of classes to support for query subscriptions
+  },
+  verifyUserEmails: false,
+  preventLoginWithUnverifiedEmail: false,
+  publicServerURL: 'http://localhost:1337/parse',
+  appName: 'Hoop Spot App',
+  emailAdapter: {
+    module: 'parse-server-simple-mailgun-adapter',
+    options: {
+      // The address that your emails come from
+      fromAddress: 'hoopspotapp@gmail.com',
+      // Your domain from mailgun.com
+      domain: 'sandboxd06e33da6736482aa7e987d02c0cf75c.mailgun.org',
+      // Your API key from mailgun.com
+      apiKey: 'key-c907b31bd1b8ed9dcbda77d1f4b27d5b',
+    }
   }
 });
 // Client-keys like the javascript key or the .NET key are not necessary with parse-server
