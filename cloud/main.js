@@ -11,16 +11,12 @@ Parse.Cloud.afterSave("CheckIn", function(request) {
 	checkInUser.fetch().then(function(user) {
 		return checkInCourt.fetch().then(function(court) {
 			var username = user.get('username');
-			console.log(username);
 			
 			var courtName = court.get('name');
-			console.log(courtName);
 			
 			var timeString = request.object.get('checkInTimeString');
-			console.log(timeString);
 
 			var message = username+" is going to "+courtName+" on "+timeString;
-			console.log(message);
 
 			var followingQuery = new Parse.Query("Follow");
 			followingQuery.equalTo("fromUser", checkInUser);
@@ -50,7 +46,6 @@ Parse.Cloud.afterSave("CheckIn", function(request) {
 
 	});
   
-  console.log('afterSave end');
   
 });
 
@@ -89,4 +84,58 @@ Parse.Cloud.afterSave("Activity", function(request) {
 		
 	}
 	
+});
+
+Parse.Cloud.afterDelete(Parse.User, function(request) {
+	console.log("Deleting user"+request.object.id);
+	var activityQuery = new Parse.Query("Activity");
+	activityQuery.equalTo("fromUser", request.object);
+	activityQuery.find({useMasterKey: true}).then(function(activityResults) {
+		console.log("Activities found:"+activityResults.length);
+		return Parse.Object.destroyAll(activityResults, {useMasterKey: true});
+		
+	}).then(function() {
+		console.log("Activities deleted");
+		var taggedActivitiesQuery = new Parse.Query("Activity");
+		taggedActivitiesQuery.equalTo("toUser",request.object);
+		return taggedActivitiesQuery.find({useMasterKey: true});
+	}).then(function(taggedResults) {
+		console.log("taggedResults");
+		return Parse.Object.destroyAll(taggedResults,{useMasterKey: true});
+	}).then(function() {
+		console.log("Tagged Activities Deleted:"+request.object.id);
+		var followerQuery = new Parse.Query("Follow");
+		followerQuery.equalTo("fromUser",request.object);
+		return followerQuery.find({useMasterKey: true});
+	}).then(function(followerResults) {
+		console.log("follower results");
+		return Parse.Object.destroyAll(followerResults, {useMasterKey: true});
+	}).then(function() {
+		console.log("followers deleted");
+		var followingQuery = new Parse.Query("Follow");
+		followingQuery.equalTo("toUser", request.object);
+		return followingQuery.find({useMasterKey: true});
+	}).then(function(followingResults) {
+		console.log("following results");
+		return Parse.Object.destroyAll(followingResults, {useMasterKey: true});
+	}).then(function(){
+		console.log("following deleted");
+		var leaderboardQuery = new Parse.Query("Leaderboard");
+		leaderboardQuery.equalTo("user",request.object);
+		return leaderboardQuery.find({useMasterKey: true});
+	}).then(function(leaderboardResults) {
+		console.log("leaderboard results");
+		return Parse.Object.destroyAll(leaderboardResults, {useMasterKey: true});
+	}).then(function() {
+		console.log("leaderboard deleted");
+		var checkinQuery = new Parse.Query("CheckIn");
+		checkinQuery.equalTo("checkInUser",request.object);
+		return checkinQuery.find({useMasterKey: true});
+	}).then(function(checkinResults) {
+		console.log("checkins found");
+		return Parse.Object.destroyAll(checkinResults, {useMasterKey: true});
+	},function(error) {
+		console.log("Error deleting user "+error.message);
+	});
+
 });

@@ -44,17 +44,17 @@ var api = new ParseServer({
   },
   verifyUserEmails: false,
   preventLoginWithUnverifiedEmail: false,
-  publicServerURL: 'http://localhost:1337/parse',
-  appName: 'Hoop Spot App',
+  publicServerURL: process.env.SERVER_URL || 'http://localhost:1337/parse',
+  appName: 'Hoop Spot',
   emailAdapter: {
     module: 'parse-server-simple-mailgun-adapter',
     options: {
       // The address that your emails come from
-      fromAddress: 'hoopspotapp@gmail.com',
+      fromAddress: process.env.MG_FROM_ADDRESS || '',
       // Your domain from mailgun.com
-      domain: 'sandboxd06e33da6736482aa7e987d02c0cf75c.mailgun.org',
+      domain: process.env.MG_DOMAIN || '',
       // Your API key from mailgun.com
-      apiKey: 'key-c907b31bd1b8ed9dcbda77d1f4b27d5b',
+      apiKey: process.env.MG_API_KEY || '',
     }
   }
 });
