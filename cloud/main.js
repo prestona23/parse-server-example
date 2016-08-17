@@ -86,7 +86,6 @@ Parse.Cloud.afterSave("Activity", function(request) {
 	else if(activityType == "Video") {
 		if(toUser.id != fromUser.id) {
 			fromUser.fetch().then(function(fromUserObject) {
-				var toUsername = toUserObject.get("username");
 				var fromUsername = fromUserObject.get("username");
 				var message = fromUsername + " has tagged you in a video!"
 				console.log(message);
