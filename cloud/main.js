@@ -84,35 +84,29 @@ Parse.Cloud.afterSave("Activity", function(request) {
 			
 	}
 	else if(activityType == "Video") {
-		console.log("Video ActivityType");
 		if(toUser.id != fromUser.id) {
-			console.log("users not equal");
-			toUser.fetch().then(function(toUserObject) {
-				console.log("fetched toUser");
-				return fromUser.fetch().then(function(fromUserObject) {
-					console.log("fetched fromUser");
-					var toUsername = toUserObject.get("username");
-					var fromUsername = fromUserObject.get("username");
-					var message = fromUsername+" has tagged you in a video!"
-					console.log(message);
-					var pushQuery = new Parse.Query(Parse.Installation);
-					pushQuery.equalTo("user",toUser)
+			fromUser.fetch().then(function(fromUserObject) {
+				var toUsername = toUserObject.get("username");
+				var fromUsername = fromUserObject.get("username");
+				var message = fromUsername + " has tagged you in a video!"
+				console.log(message);
+				var pushQuery = new Parse.Query(Parse.Installation);
+				pushQuery.equalTo("user", toUser)
 
-					Parse.Push.send({
-		  				where: pushQuery,
-			  			data: {
-			    			alert: message
-			  			}
-		   			}, { useMasterKey: true }).then(function() {
-			    		// Push was successful
-						console.log('Tagged Push Success!!!');
-		  			}, function(error) {
-						console.log('Push Error');
-			    		throw "Got an error " + error.code + " : " + error.message;
-		  			});
+				Parse.Push.send({
+					where: pushQuery,
+					data: {
+						alert: message
+					}
+				}, { useMasterKey: true }).then(function () {
+					// Push was successful
+					console.log('Tagged Push Success!!!');
+				}, function (error) {
+					console.log('Push Error');
+					throw "Got an error " + error.code + " : " + error.message;
 				});
 			}, function(error) {
-				console.log("Error Pushing after activity");
+				console.log("Error Pushing after activity:"+error.message);
 			});
 		}
 	}
