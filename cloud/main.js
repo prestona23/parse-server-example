@@ -33,7 +33,7 @@ Parse.Cloud.afterSave("CheckIn", function(request) {
 			  data: {
 			    alert: message
 			  }
-		  }, { useMasterKey: true }).then(function() {
+		   }, { useMasterKey: true }).then(function() {
 			    // Push was successful
 					console.log('Push Success!!!');
 		  }, function(error) {
@@ -55,7 +55,8 @@ Parse.Cloud.afterSave("Activity", function(request) {
 	
 	var location = request.object.get("location");
 	var toUser = request.object.get("toUser");
-	
+	var fromUser = request.object.get("fromUser");
+
 	if(activityType == "Like") {
 		var leaderboardQuery = new Parse.Query("Leaderboard");
 		leaderboardQuery.equalTo("court",location);
@@ -80,8 +81,35 @@ Parse.Cloud.afterSave("Activity", function(request) {
 		}, function(error){
 			console.log("Error updating leaderboard");
 		});
-		
-		
+			
+	}
+	else if(activityType == "Video") {
+		if(toUser.id != fromUser.id) {
+			toUser.fetch.then(function(toUser) {
+				return fromUser.fetch().then(function(fromUser) {
+					var toUsername = toUser.get("username");
+					var fromUsername = fromUser.get("username");
+					var message = fromUsername+" has tagged you in a video!"
+					var pushQuery = new Parse.Query(Parse.Installation);
+					pushQuery.equalTo("user",toUser)
+
+					Parse.Push.send({
+		  				where: pushQuery,
+			  			data: {
+			    			alert: message
+			  			}
+		   			}, { useMasterKey: true }).then(function() {
+			    		// Push was successful
+						console.log('Tagged Push Success!!!');
+		  			}, function(error) {
+						console.log('Push Error');
+			    		throw "Got an error " + error.code + " : " + error.message;
+		  			});
+				});
+			}, function(error) {
+				console.log("Error Pushing after activity");
+			});
+		}
 	}
 	
 });
