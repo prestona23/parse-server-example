@@ -87,12 +87,12 @@ Parse.Cloud.afterSave("Activity", function(request) {
 		console.log("Video ActivityType");
 		if(toUser.id != fromUser.id) {
 			console.log("users not equal");
-			toUser.fetch.then(function(toUser) {
+			toUser.fetch().then(function(toUserObject) {
 				console.log("fetched toUser");
-				return fromUser.fetch().then(function(fromUser) {
+				return fromUser.fetch().then(function(fromUserObject) {
 					console.log("fetched fromUser");
-					var toUsername = toUser.get("username");
-					var fromUsername = fromUser.get("username");
+					var toUsername = toUserObject.get("username");
+					var fromUsername = fromUserObject.get("username");
 					var message = fromUsername+" has tagged you in a video!"
 					console.log(message);
 					var pushQuery = new Parse.Query(Parse.Installation);
