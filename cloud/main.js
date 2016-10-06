@@ -112,6 +112,36 @@ Parse.Cloud.afterSave("Activity", function(request) {
 	
 });
 
+Parse.Cloud.afterSave("Follow", function(request) {
+	console.log('Follow aftersave');
+
+	var toUser = request.object.get("toUser");
+	var fromUser = request.object.get("fromUser");
+	
+	fromUser.fetch().then(function (fromUserObject) {
+		var fromUsername = fromUserObject.get("username");
+		var message = fromUsername + " has followed you!"
+		var pushQuery = new Parse.Query(Parse.Installation);
+		pushQuery.equalTo("user", toUser)
+
+		Parse.Push.send({
+			where: pushQuery,
+			data: {
+				alert: message
+			}
+		}, { useMasterKey: true }).then(function () {
+			// Push was successful
+			console.log('Followed Push Success!!!');
+		}, function (error) {
+			console.log('Push Error');
+			throw "Got an error " + error.code + " : " + error.message;
+		});
+	}, function (error) {
+		console.log("Error Pushing after follow:" + error.message);
+	});
+	
+});
+
 Parse.Cloud.afterDelete(Parse.User, function(request) {
 	console.log("Deleting user"+request.object.id);
 	var activityQuery = new Parse.Query("Activity");
