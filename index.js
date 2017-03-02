@@ -28,11 +28,6 @@ var api = new ParseServer({
   push: {
     ios: [
       {
-        pfx: 'push/ios/HoopSpotDevPushCertificate.p12', // Dev PFX or P12
-        bundleId: 'com.mobile-software.HoopSpot',
-        production: false // Dev
-      },
-      {
         pfx: 'push/ios/HoopSpotProductionPush.p12', // Prod PFX or P12
         bundleId: 'com.mobile-software.HoopSpot',  
         production: true // Prod
